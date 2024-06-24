@@ -1,0 +1,41 @@
+spring:
+    cloud:
+        function:
+            definition: flightConsumer;
+        stream:
+            binders:
+                rabbit:
+                    environment:
+                        spring:
+                            rabbitmq:
+                                host: localhost
+                                password: guest
+                                port: 5672
+                                username: guest
+                                virtual-host: /
+                    type: rabbit
+            bindings:
+                flightConsumer-in-0:
+                    binder: rabbit
+                    destination: flight_info
+                    group: sub.flight_info
+                flightProducer-out-0:
+                    binder: rabbit
+                    destination: flight_info
+            rabbit:
+                bindings:
+                    flightConsumer-in-0:
+                        consumer:
+                            bindingRoutingKey: flight-info-rk
+                            queueNameGroupOnly: true
+                    flightProducer-out-0:
+                        producer:
+                            routing-key-expression: '''flight-info-rk'''
+    datasource:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        password: root
+        url: jdbc:mysql://localhost:3306/flight_db
+        username: root
+    jpa:
+        hibernate:
+            ddl-auto: update
